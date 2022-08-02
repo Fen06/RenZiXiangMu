@@ -9,6 +9,10 @@ router.beforeEach((to, from, next) => {
   const token = store.state.user.token
   if (token) {
     //   登录后是否进入登录页
+    if (!store.state.user.userinfo.userId) {
+      store.dispatch('user/getUserInfo')
+    }
+
     if (to.path === '/login') return next('/')
     next()
   } else {

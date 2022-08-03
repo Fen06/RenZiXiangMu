@@ -11,7 +11,7 @@ const service = axios.create({
 function tokenOut() {
   const nowTimer = Date.now()
   const setToken = getTokenTime()
-  const timeOut = 3 * 1000
+  const timeOut = 2 * 60 * 60 * 1000
   return nowTimer - setToken > timeOut
 }
 service.interceptors.request.use(async (config) => {

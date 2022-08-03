@@ -35,9 +35,26 @@ Vue.use(ElementUI, { locale })
 
 Vue.config.productionTip = false
 
+//参数1.自定义指令的名字，不需要+v-
+//参数2.是配置对象
+// Vue.directive('imgError', {
+//   //当前被绑定的元素插入到DOM中
+//   inserted: function (el, { value }) {
+//     //聚集元素
+//     el.onerror = function () {
+//       el.src = value
+//     }
+//   }
+// })
+
+import * as directive from '@/directives'
+
+for (let key in directive) {
+  Vue.directive(key, directive[key])
+}
 new Vue({
   el: '#app',
   router,
   store,
-  render: h => h(App)
+  render: (h) => h(App)
 })

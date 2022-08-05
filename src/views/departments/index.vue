@@ -19,6 +19,8 @@
 
 <script>
 import TreeTools from './components/tree-tools.vue'
+import { getDeptsApi } from '@/api/departments'
+import { transListToTree } from '@/utils/index'
 export default {
   data() {
     return {
@@ -30,16 +32,28 @@ export default {
       defaultProps: {
         label: 'name'
       },
-      compan: { name: '传值教育', marage: '负责人' }
+      compan: { name: '传值教育', manager: '负责人' }
     }
   },
   components: {
     TreeTools
   },
 
-  created() {},
+  created() {
+    this.getDeptsApi()
+  },
 
-  methods: {}
+  methods: {
+    async getDeptsApi() {
+      try {
+        const res = await getDeptsApi()
+        console.log(res)
+        this.treeData = transListToTree(res.depts, '')
+      } catch (e) {
+        console.log('depts', e)
+      }
+    }
+  }
 }
 </script>
 

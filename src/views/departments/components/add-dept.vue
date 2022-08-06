@@ -1,5 +1,5 @@
 <template>
-  <el-dialog @close="onClose" title="添加部门" :visible="visible" width="40%">
+  <el-dialog @close="onClose" :title="itTitle" :visible="visible" width="40%">
     <el-form
       ref="form"
       :model="formData"
@@ -43,7 +43,12 @@
 </template>
 
 <script>
-import { getDeptsApi, addDeptsApi } from '@/api/departments'
+import {
+  getDeptsApi,
+  addDeptsApi,
+  getDeptById,
+  editDeptById
+} from '@/api/departments'
 import { getPeopleApi } from '@/api/employees'
 export default {
   props: {
@@ -57,15 +62,34 @@ export default {
     }
   },
   data() {
-    const checkDeptName = (rule, value, callback) => {
-      if (!this.current.children) return callback()
-      const isTrue = this.current.children.some((item) => item.name === value)
-      isTrue ? callback(new Error('部门重复')) : callback()
+    const checkDeptName = async (rule, value, callback) => {
+      if (this.formData.id) {
+        const { depts } = await getDeptsApi()
+        const filterDepts = depts.filter(
+          (item) =>
+            item.pid === this.formData.pid && item.id !== this.formData.id
+        )
+        console.log(filterDepts)
+        const isTrue = filterDepts.some((item) => item.name === value)
+        isTrue ? callback(new Error('部门重复')) : callback()
+      } else {
+        if (!this.current.children) return callback()
+        const isTrue = this.current.children.some((item) => item.name === value)
+        isTrue ? callback(new Error('部门重复')) : callback()
+      }
     }
 
     const checkDeptCode = async (rule, value, callback) => {
       const { depts } = await getDeptsApi()
-      const isTrue = depts.some((item) => item.code === value)
+      let isTrue
+      if (this.formData.id) {
+        isTrue = depts
+          .filter((item) => item.id !== this.formData.id)
+          .some((item) => item.code === value)
+      } else {
+        isTrue = depts.some((item) => item.code === value)
+      }
+
       isTrue ? callback(new Error('编码重复')) : callback()
     }
     return {
@@ -102,7 +126,11 @@ export default {
   created() {
     this.getPeopleApi()
   },
-
+  computed: {
+    itTitle() {
+      return this.formData.id ? '编辑部门' : '添加部门'
+    }
+  },
   methods: {
     async getPeopleApi() {
       const res = await getPeopleApi()
@@ -111,18 +139,35 @@ export default {
     },
     onClose() {
       this.$emit('update:visible', false)
+      this.$refs.form.resetFields()
+      this.formData = {
+        name: '',
+        code: '',
+        manager: '',
+        introduce: ''
+      }
     },
     async onSave() {
       await this.$refs.form.validate()
-      this.formData.pid = this.current.id
       try {
-        await addDeptsApi(this.formData)
-        this.$message.success('新增部门成功')
-        this.onClose()
-        this.$emit('add-success')
+        if (this.formData.id) {
+          await editDeptById(this.formData)
+          this.$message.success('编辑部门成功')
+          this.onClose()
+          this.$emit('add-success')
+        } else {
+          this.formData.pid = this.current.id
+          await addDeptsApi(this.formData)
+          this.$message.success('新增部门成功')
+          this.onClose()
+          this.$emit('add-success')
+        }
       } catch (e) {
-        this.$message.error('新增部门失败')
+        this.$message.error('操作部门失败')
       }
+    },
+    async getDeptById(id) {
+      this.formData = await getDeptById(id)
     }
   }
 }

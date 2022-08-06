@@ -5,3 +5,18 @@ export function getDeptsApi() {
     url: '/company/department'
   })
 }
+
+export function delDeptsApi(id) {
+  return request({
+    url: `/company/department/${id}`,
+    method: 'DELETE'
+  })
+}
+
+export function addDeptsApi(data) {
+  return request({
+    url: '/company/department',
+    method: 'POST',
+    data
+  })
+}

@@ -5,12 +5,12 @@ const whileList = ['/login', '/404']
 //to:去哪里的路由信息
 //from:来自哪个路由信息
 //next:是否进入
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const token = store.state.user.token
   if (token) {
     //   登录后是否进入登录页
     if (!store.state.user.userinfo.userId) {
-      store.dispatch('user/getUserInfo')
+      await store.dispatch('user/getUserInfo')
     }
 
     if (to.path === '/login') return next('/')

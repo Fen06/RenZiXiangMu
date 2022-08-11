@@ -18,19 +18,46 @@
               </template>
             </el-table-column>
           </el-table>
+          <!-- 分页 -->
+          <el-pagination
+            layout="sizes,prev, pager, next"
+            :total="total"
+            :page-sizes="[3, 5, 10, 20]"
+            :page-size="pageSize"
+            @current-change="handleCurrentChange"
+            @size-change="handleSizeChange"
+          >
+          </el-pagination>
         </el-tab-pane>
-        <el-tab-pane label="配置管理" name="second">配置管理</el-tab-pane>
+
+        <!-- 公司信息------------- -->
+        <el-tab-pane label="公司信息" name="second">
+          <el-alert
+            title="对公司名称、公司地址、营业执照、公司地区的更新，将使得公司资料被重新审核，请谨慎修改"
+            type="info"
+            show-icon
+            :closable="false"
+          >
+          </el-alert>
+          <el-form ref="form" label-width="80px">
+            <el-form-item label="公司名称">
+              <el-input v-model="CompanyInfo.name" disabled></el-input>
+            </el-form-item>
+            <el-form-item label="公司地址">
+              <el-input
+                v-model="CompanyInfo.companyAddress"
+                disabled
+              ></el-input>
+            </el-form-item>
+            <el-form-item label="公司邮箱">
+              <el-input v-model="CompanyInfo.mailbox" disabled></el-input>
+            </el-form-item>
+            <el-form-item label="备注">
+              <el-input v-model="CompanyInfo.remarks" disabled></el-input>
+            </el-form-item>
+          </el-form>
+        </el-tab-pane>
       </el-tabs>
-      <!-- 分页 -->
-      <el-pagination
-        layout="sizes,prev, pager, next"
-        :total="total"
-        :page-sizes="[3, 5, 10, 20]"
-        :page-size="pageSize"
-        @current-change="handleCurrentChange"
-        @size-change="handleSizeChange"
-      >
-      </el-pagination>
     </div>
     <!-- 对话框 -->
     <el-dialog
@@ -62,6 +89,7 @@
 
 <script>
 import { getRolesApi, getAddRolesApi } from '@/api/role'
+import { getCompanyInfoApi } from '@/api/setting'
 export default {
   data() {
     return {
@@ -77,12 +105,14 @@ export default {
       tableData: [],
       total: 0,
       pageSize: 3,
-      page: 1
+      page: 1,
+      CompanyInfo: {}
     }
   },
 
   created() {
     this.getRolesApi()
+    this.getCompanyInfoApi()
   },
 
   methods: {
@@ -117,6 +147,13 @@ export default {
     onClose() {
       this.$refs.form.resetFields()
       this.AddRolesForm.description = ''
+    },
+    async getCompanyInfoApi() {
+      const res = await getCompanyInfoApi(
+        this.$store.state.user.userinfo.companyId
+      )
+      console.log(res)
+      this.CompanyInfo = res
     }
   }
 }

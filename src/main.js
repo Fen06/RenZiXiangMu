@@ -34,7 +34,15 @@ Vue.use(ElementUI, { locale })
 // Vue.use(ElementUI)
 Vue.use(components)
 Vue.config.productionTip = false
+// Vue.filter('formatTime', (val) => {
 
+// })
+
+import * as filters from '@/filters'
+
+for (let key in filters) {
+  Vue.filter(key, filters[key])
+}
 //参数1.自定义指令的名字，不需要+v-
 //参数2.是配置对象
 // Vue.directive('imgError', {

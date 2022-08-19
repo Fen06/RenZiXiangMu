@@ -12,7 +12,12 @@
             <el-table-column prop="description" label="描述"> </el-table-column>
             <el-table-column prop="address" label="操作">
               <template>
-                <el-button size="small" type="success">分配权限</el-button>
+                <el-button
+                  size="small"
+                  type="success"
+                  @click="onSetRightsDialog"
+                  >分配权限</el-button
+                >
                 <el-button size="small" type="primary">编辑</el-button>
                 <el-button size="small" type="danger">删除</el-button>
               </template>
@@ -84,12 +89,35 @@
         <el-button type="primary" @click="onAddrole">确 定</el-button>
       </span>
     </el-dialog>
+    <!-- 分配角色对话框 -->
+    <el-dialog
+      title="给用户分配角色"
+      :visible.sync="SetRightsDialog"
+      width="50%"
+    >
+      <el-tree
+        default-expand-all
+        show-checkbox
+        node-key="id"
+        :default-checked-keys="DefaultCheckedKeys"
+        :data="permissions"
+        :props="{ label: 'name' }"
+      ></el-tree>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="SetRightsDialog = false">取 消</el-button>
+        <el-button type="primary">确 定</el-button>
+      </span>
+    </el-dialog>
+
+    <!-- 分配角色对话框 -->
   </div>
 </template>
 
 <script>
 import { getRolesApi, getAddRolesApi } from '@/api/role'
 import { getCompanyInfoApi } from '@/api/setting'
+import { getPermissionList } from '@/api/permission'
+import { transListToTree } from '@/utils'
 export default {
   data() {
     return {
@@ -106,16 +134,23 @@ export default {
       total: 0,
       pageSize: 3,
       page: 1,
-      CompanyInfo: {}
+      CompanyInfo: {},
+      SetRightsDialog: false,
+      permissions: [],
+      DefaultCheckedKeys: ['1', '1063315016368918528']
     }
   },
 
   created() {
     this.getRolesApi()
     this.getCompanyInfoApi()
+    this.getPermissions()
   },
 
   methods: {
+    onSetRightsDialog() {
+      this.SetRightsDialog = true
+    },
     Add() {
       this.AddDialogVisible = true
     },
@@ -154,6 +189,13 @@ export default {
       )
       console.log(res)
       this.CompanyInfo = res
+    },
+    async getPermissions() {
+      const res = await getPermissionList()
+      console.log(res)
+      const treePermission = transListToTree(res, '0')
+      console.log(treePermission)
+      this.permissions = treePermission
     }
   }
 }

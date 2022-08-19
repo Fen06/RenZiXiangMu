@@ -27,7 +27,9 @@
           <el-tab-pane label="个人详情" name="user">
             <userInfo></userInfo>
           </el-tab-pane>
-          <el-tab-pane label="岗位信息" name="job" />
+          <el-tab-pane label="岗位信息" name="job">
+            <iconPrinter></iconPrinter>
+          </el-tab-pane>
         </el-tabs>
       </el-card>
     </div>
@@ -37,16 +39,18 @@
 <script>
 import { getUserDetail, saveUserDetailById } from '@/api/user'
 import userInfo from './components/user-info.vue'
+import iconPrinter from './components/icon-printer'
 import Cookies from 'js-cookie'
 export default {
   data() {
     return {
       formData: {},
-      activeName: Cookies.get('employees') || "account"
+      activeName: Cookies.get('employees') || 'account'
     }
   },
   components: {
-    userInfo
+    userInfo,
+    iconPrinter
   },
   created() {
     this.getUserDetail()

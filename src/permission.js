@@ -1,4 +1,4 @@
-import router from '@/router'
+import router, { asyncRoutes } from '@/router'
 import store from '@/store'
 // 全局路由守卫
 const whileList = ['/login', '/404']
@@ -10,7 +10,9 @@ router.beforeEach(async (to, from, next) => {
   if (token) {
     //   登录后是否进入登录页
     if (!store.state.user.userinfo.userId) {
-      await store.dispatch('user/getUserInfo')
+      const { roles } = await store.dispatch('user/getUserInfo')
+      await store.dispatch('permission/filterRoutes', roles)
+      next(to.path)
     }
 
     if (to.path === '/login') return next('/')

@@ -7,3 +7,11 @@ export function getPermissionList(params) {
     params
   })
 }
+
+export function getAddPermission(data) {
+  return request({
+    url: '/sys/permission',
+    method: 'POST',
+    data
+  })
+}

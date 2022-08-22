@@ -1,3 +1,5 @@
+import store from '@/store'
+
 export const imgError = {
   //当前被绑定的元素插入到DOM中
   //令绑定的元素插入到dom的时候，图片数据还没返回回来，可以用下方的updata来解决
@@ -15,6 +17,15 @@ export const imgError = {
   update(el, { value }) {
     if (!el.src) {
       el.src = value
+    }
+  }
+}
+
+export const isHas = {
+  inserted(el, binding) {
+    const has = store.state.permission.points.includes(binding.value)
+    if (!has) {
+      el.remove()
     }
   }
 }

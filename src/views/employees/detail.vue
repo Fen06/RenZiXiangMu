@@ -3,7 +3,7 @@
     <div class="app-container">
       <el-card>
         <el-tabs v-model="activeName" @tab-click="handleTabClick">
-          <el-tab-pane label="登录账户设置" name="account">
+          <el-tab-pane name="account" label="登录账户设置">
             <!-- 放置表单 -->
             <el-form
               label-width="120px"
@@ -24,11 +24,11 @@
               </el-form-item>
             </el-form>
           </el-tab-pane>
-          <el-tab-pane label="个人详情" name="user">
-            <userInfo></userInfo>
+          <el-tab-pane name="user" label="个人详情">
+            <user-info />
           </el-tab-pane>
-          <el-tab-pane label="岗位信息" name="job">
-            <iconPrinter></iconPrinter>
+          <el-tab-pane name="job" label="岗位信息">
+            <JobInfo />
           </el-tab-pane>
         </el-tabs>
       </el-card>
@@ -37,29 +37,38 @@
 </template>
 
 <script>
-import { getUserDetail, saveUserDetailById } from '@/api/user'
-import userInfo from './components/user-info.vue'
-import iconPrinter from './components/icon-printer'
+import { getUserDetail, saveUserDetailById } from '@/api/user.js'
+import UserInfo from './components/user-info.vue'
+import JobInfo from './components/job-info.vue'
 import Cookies from 'js-cookie'
 export default {
   data() {
     return {
       formData: {},
-      activeName: Cookies.get('employees') || 'account'
+      activeName: Cookies.get('employeeDetailTab') || 'account',
     }
   },
-  components: {
-    userInfo,
-    iconPrinter
+  // 路由开启props,此时可以接收路由参数
+  props: {
+    id: {
+      required: true,
+      type: String,
+    },
   },
+
+  components: {
+    UserInfo,
+    JobInfo,
+  },
+
   created() {
-    this.getUserDetail()
+    this.loadUserDetail()
+    // console.log(this.$attrs)
   },
 
   methods: {
-    async getUserDetail() {
+    async loadUserDetail() {
       const res = await getUserDetail(this.$route.params.id)
-      //   console.log(res)
       this.formData = res
     },
     async onSave() {
@@ -67,10 +76,10 @@ export default {
       this.$message.success('更新成功')
     },
     handleTabClick() {
-      Cookies.set('employees', this.activeName)
-    }
-  }
+      Cookies.set('employeeDetailTab', this.activeName)
+    },
+  },
 }
 </script>
 
-<style scoped></style>
+<style scoped lang="less"></style>

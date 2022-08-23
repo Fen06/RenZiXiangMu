@@ -19,24 +19,29 @@
 <script>
 export default {
   name: 'PageTools',
-  props: {
-    leftIcon: {
-      type: String,
-      default: 'el-icon-info'
-    },
-    isShowLeft: {
-      type: Boolean,
-      default: true
-    }
-  },
   data() {
     return {}
   },
 
+  props: {
+    leftIcon: {
+      type: String,
+      default: 'el-icon-info',
+    },
+    isShowLeft: {
+      type: Boolean,
+      default: true,
+    },
+  },
+
   created() {},
 
-  methods: {}
+  methods: {},
 }
 </script>
 
-<style scoped></style>
+<style scoped lang="scss">
+.box-card {
+  margin: 10px 0;
+}
+</style>

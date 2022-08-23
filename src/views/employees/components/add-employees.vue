@@ -1,7 +1,6 @@
 <template>
-  <el-dialog title="提示" @close="onClose" :visible="visible" width="30%">
-    <!-- 表单 -->
-    <el-form :model="formData" :rules="rules" label-width="120px" ref="form">
+  <el-dialog @close="onClose" title="新增员工" :visible="visible" width="50%">
+    <el-form ref="form" :model="formData" :rules="rules" label-width="120px">
       <el-form-item label="姓名" prop="username">
         <el-input
           v-model="formData.username"
@@ -52,14 +51,14 @@
           placeholder="请选择部门"
         /> -->
         <el-select
+          @focus="getDepts"
           v-model="formData.departmentName"
           placeholder="请选择部门"
-          @focus="getDepts"
-          ref="departmentName"
+          ref="deptSelect"
         >
-          <el-option value="" v-loading="loading" class="treeOption">
+          <el-option class="treeOption" v-loading="isTreeLoading" value="">
             <el-tree
-              @node-click="NodeClick"
+              @node-click="treeNodeClick"
               :data="depts"
               :props="treeProps"
             ></el-tree>
@@ -74,41 +73,22 @@
         />
       </el-form-item>
     </el-form>
-    <!-- footer插槽 -->
-    <template v-slot:footer>
-      <el-row type="flex" justify="center">
-        <el-col :span="6">
-          <el-button size="small" @click="onClose">取消</el-button>
-          <el-button type="primary" size="small" @click="onSave"
-            >确定</el-button
-          >
-        </el-col>
-      </el-row>
-    </template>
     <span slot="footer" class="dialog-footer">
       <el-button @click="onClose">取 消</el-button>
-      <el-button>确 定</el-button>
+      <el-button @click="onSave" type="primary">确 定</el-button>
     </span>
   </el-dialog>
 </template>
 
 <script>
 import employees from '@/constant/employees'
-const { hireType } = employees
-import { addEmployee } from '@/api/employees'
 import { getDeptsApi } from '@/api/departments'
 import { transListToTree } from '@/utils'
+import { addEmployee } from '@/api/employees'
+const { hireType } = employees
 export default {
-  props: {
-    visible: {
-      type: Boolean,
-      default: true
-    }
-  },
   data() {
     return {
-      loading: false,
-      hireType,
       formData: {
         username: '',
         mobile: '',
@@ -116,7 +96,7 @@ export default {
         workNumber: '',
         departmentName: '',
         timeOfEntry: '',
-        correctionTime: ''
+        correctionTime: '',
       },
       rules: {
         username: [
@@ -124,68 +104,75 @@ export default {
           {
             min: 1,
             max: 4,
-            message: '用户姓名为1-4位'
-          }
+            message: '用户姓名为1-4位',
+          },
         ],
         mobile: [
           { required: true, message: '手机号不能为空', trigger: 'blur' },
           {
             pattern: /^1[3-9]\d{9}$/,
             message: '手机号格式不正确',
-            trigger: 'blur'
-          }
+            trigger: 'blur',
+          },
         ],
         formOfEmployment: [
-          { required: true, message: '聘用形式不能为空', trigger: 'change' }
+          { required: true, message: '聘用形式不能为空', trigger: 'change' },
         ],
         workNumber: [
-          { required: true, message: '工号不能为空', trigger: 'blur' }
+          { required: true, message: '工号不能为空', trigger: 'blur' },
         ],
         departmentName: [
-          { required: true, message: '部门不能为空', trigger: 'change' }
+          { required: true, message: '部门不能为空', trigger: 'blur' },
         ],
         timeOfEntry: [
-          { required: true, message: '入职时间', trigger: 'change' }
-        ]
+          { required: true, message: '入职时间', trigger: 'change' },
+        ],
       },
+      hireType,
       depts: [],
       treeProps: {
-        label: 'name'
-      }
+        label: 'name',
+      },
+      isTreeLoading: false,
     }
+  },
+
+  props: {
+    visible: {
+      type: Boolean,
+      required: true,
+    },
   },
 
   created() {},
 
   methods: {
+    onClose() {
+      this.$emit('update:visible', false)
+      this.$refs.form.resetFields()
+    },
+    async getDepts() {
+      this.isTreeLoading = true
+      const { depts } = await getDeptsApi()
+      transListToTree(depts, '')
+      this.depts = depts
+      this.isTreeLoading = false
+    },
+    treeNodeClick(row) {
+      // console.log(row)
+      this.formData.departmentName = row.name
+      this.$refs.deptSelect.blur()
+    },
     onSave() {
       this.$refs.form.validate(async (valid) => {
         if (!valid) return
         await addEmployee(this.formData)
-        this.$message.success('新增成功')
+        this.$message.success('添加成功')
         this.onClose()
         this.$emit('add-success')
-        this.formData = {}
       })
     },
-    NodeClick(row) {
-      //   console.log(row)
-      this.formData.departmentName = row.name
-      this.$refs.departmentName.blur()
-    },
-    async getDepts() {
-      this.loading = true
-      const { depts } = await getDeptsApi()
-      console.log(depts)
-      transListToTree(depts, '')
-      this.depts = depts
-      this.loading = false
-    },
-    onClose() {
-      this.$emit('update:visible', false)
-      this.$refs.form.resetFields()
-    }
-  }
+  },
 }
 </script>
 

@@ -33,17 +33,18 @@
 <script>
 import XLSX from 'xlsx'
 export default {
+  name: 'UploadExcel',
   props: {
     beforeUpload: Function, // eslint-disable-line
-    onSuccess: Function // eslint-disable-line
+    onSuccess: Function, // eslint-disable-line
   },
   data() {
     return {
       loading: false,
       excelData: {
         header: null,
-        results: null
-      }
+        results: null,
+      },
     }
   },
   methods: {
@@ -133,8 +134,8 @@ export default {
     },
     isExcel(file) {
       return /\.(xlsx|xls|csv)$/.test(file.name)
-    }
-  }
+    },
+  },
 }
 </script>
 

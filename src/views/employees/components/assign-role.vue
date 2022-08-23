@@ -1,18 +1,16 @@
 <template>
-  <el-dialog
-    @open="onOpen"
-    @close="onClose"
-    title="分配角色"
-    :visible="visible"
-  >
+  <el-dialog @open="onOpen" @close="close" title="分配角色" :visible="visible">
     <el-checkbox-group v-model="checkList">
+      <!-- label: 渲染 name -->
+      <!-- 会记录选中值 id -->
       <el-checkbox v-for="item in roles" :key="item.id" :label="item.id">
+        <!-- 插槽也可以用于渲染 -->
         {{ item.name }}
       </el-checkbox>
     </el-checkbox-group>
     <span slot="footer" class="dialog-footer">
-      <el-button @click="onClose">取 消</el-button>
-      <el-button type="primary" @click="onAssignRoles">确 定</el-button>
+      <el-button @click="close">取 消</el-button>
+      <el-button type="primary" @click="assignRole">确 定</el-button>
     </span>
   </el-dialog>
 </template>
@@ -22,54 +20,58 @@ import { getRolesApi } from '@/api/role'
 import { getUserDetail } from '@/api/user'
 import { assignRoles } from '@/api/employees'
 export default {
+  data() {
+    return {
+      checkList: [], // 记录选中的角色
+      roles: [],
+    }
+  },
+
   props: {
     visible: {
       type: Boolean,
-      required: true
+      required: true,
     },
-    currentId: {
+    employeesId: {
       type: String,
-      required: true
-    }
-  },
-  data() {
-    return {
-      roles: [],
-      checkList: []
-    }
+      required: true,
+    },
   },
 
   created() {},
 
   methods: {
-    onClose() {
+    close() {
       this.$emit('update:visible', false)
     },
-    async getRolesApi() {
-      const res = await getRolesApi()
-      console.log(res.rows)
-      this.roles = res.rows
+    // 获取角色列表
+    async getRolesList() {
+      const { rows } = await getRolesApi()
+      this.roles = rows
     },
+    // 监听对话框打开
     onOpen() {
-      this.getRolesApi()
-      this.getUserDetail()
+      this.getRolesList()
+      this.getEmployeesRoles()
     },
-
-    async getUserDetail() {
-      const { roleIds } = await getUserDetail(this.currentId)
+    // 获取员工角色
+    async getEmployeesRoles() {
+      // console.log()
+      const { roleIds } = await getUserDetail(this.employeesId)
       this.checkList = roleIds
     },
-    async onAssignRoles() {
-      if (!this.checkList.length) return this.$message.error('请分配角色')
-      assignRoles({
-        id: this.currentId,
-        roleIds: this.checkList
+    // 分配角色
+    async assignRole() {
+      if (!this.checkList.length) return this.$message.error('请选择角色')
+      await assignRoles({
+        id: this.employeesId,
+        roleIds: this.checkList,
       })
-      this.$message.success('角色分配成功')
-      this.onClose()
-    }
-  }
+      this.$message.success('分配成功')
+      this.close()
+    },
+  },
 }
 </script>
 
-<style scoped></style>
+<style scoped lang="less"></style>

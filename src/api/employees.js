@@ -1,21 +1,35 @@
 import request from '@/utils/request'
 
-export function getPeopleApi() {
+/**
+ * 获取员工列表(简单)
+ * @returns promise
+ */
+export function getEmployeesApi() {
   return request({
-    url: '/sys/user/simple'
+    url: '/sys/user/simple',
   })
 }
-export function getEmployeesApi(params) {
+
+/**
+ * 获取员工列表
+ * @param {*} params {page, size}
+ * @returns
+ */
+export function getEmployeesInfoApi(params) {
   return request({
     url: '/sys/user',
-    params
+    params,
   })
 }
+
+/**
+ * 删除员工接口
+ * ****/
 
 export function delEmployee(id) {
   return request({
     url: `/sys/user/${id}`,
-    method: 'delete'
+    method: 'delete',
   })
 }
 
@@ -26,15 +40,18 @@ export function addEmployee(data) {
   return request({
     method: 'post',
     url: '/sys/user',
-    data
+    data,
   })
 }
-
-export function importEmployee(data) {
+/**
+ * 批量导入员工
+ * @param {*} data 员工数组
+ */
+export function importEmployees(data) {
   return request({
-    url: '/sys/user/batch',
     method: 'post',
-    data
+    url: '/sys/user/batch',
+    data,
   })
 }
 
@@ -43,7 +60,7 @@ export function importEmployee(data) {
  * **/
 export function getPersonalDetail(id) {
   return request({
-    url: `/employees/${id}/personalInfo`
+    url: `/employees/${id}/personalInfo`,
   })
 }
 
@@ -54,7 +71,7 @@ export function updatePersonal(data) {
   return request({
     url: `/employees/${data.userId}/personalInfo`,
     method: 'put',
-    data
+    data,
   })
 }
 
@@ -65,6 +82,6 @@ export function assignRoles(data) {
   return request({
     url: '/sys/user/assignRoles',
     data,
-    method: 'put'
+    method: 'put',
   })
 }

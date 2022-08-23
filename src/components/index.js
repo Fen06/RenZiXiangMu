@@ -1,10 +1,24 @@
-import PageTools from './PageTools'
-import UploadExcel from './UploadExcel'
-import Uploading from './Uploading'
+import PageTools from '@/components/PageTools'
+import MyTest from '@/components/MyTest'
+import UploadExcel from '@/components/UploadExcel'
+import UploadImg from '@/components/UploadImg'
+import Calendar from '@/components/Calendar'
+import FullScree from '@/components/FullScree'
+import ToggleLang from '@/components/ToggleLang'
+// ToggleLang
+const components = [
+  PageTools,
+  MyTest,
+  UploadExcel,
+  UploadImg,
+  Calendar,
+  FullScree,
+  ToggleLang
+]
 export default {
   install(Vue) {
-    Vue.component('PageTools', PageTools) // 注册工具栏组件
-    Vue.component('UploadExcel', UploadExcel) // 注册导入excel组件
-    Vue.component('Uploading', Uploading) // 注册导入excel组件
+    components.forEach((component) => {
+      Vue.component(component.name, component)
+    })
   }
 }
